@@ -19,9 +19,9 @@ const ItemCtrl = (function() {
         // We use an array of objects:
         // Each item will have an ID, name and calories:
         items: [
-            {id: 0, name: 'Steak Dinner', calories: 1200},
-            {id: 1, name: 'Cookie', calories: 400},
-            {id: 2, name: 'Eggs', calories: 300}
+            // {id: 0, name: 'Steak Dinner', calories: 1200},
+            // {id: 1, name: 'Cookie', calories: 400},
+            // {id: 2, name: 'Eggs', calories: 300}
         ],
         currentItem: null, // When we click the update button in the UI we want the clicked item to be the currentItem, then that is going to be put up in the form to be updated
         totalCalories: 0
@@ -117,6 +117,35 @@ const UICtrl = (function() {
                 calories:document.querySelector(UISelectors.itemCaloriesInput).value
             }
         },
+        // Add new item to the UI 
+        addListItem: function(item){
+            // Show the list with items:
+            document.querySelector(UISelectors.itemList).style.display = 'block';
+            // Create li element
+            const li = document.createElement('li');
+            // Add class:
+            li.className = 'collection-item';
+            // Add id, this is going to be dynamic:
+            li.id = `item-${item.id}`;
+            // Add HTML:
+            li.innerHTML = `
+            <strong>${item.name}: </strong> <em>${item.calories}  Calories</em>
+            <a href="#" class="secondary-content">
+                <i class="edit-item fa fa-pencil"></i>
+            </a>`;
+            // Now we just have to insert it:
+            document.querySelector(UISelectors.itemList).insertAdjacentElement('beforeend', li);
+        },
+        // Clear input fields in the UI:
+        clearInput: function(){
+            document.querySelector(UISelectors.itemNameInput).value = '';
+            document.querySelector(UISelectors.itemCaloriesInput).value = '';
+        },
+        // Hide list if no items:
+        // Use this function in the init below!
+        hideList: function(){
+            document.querySelector(UISelectors.itemList).style.display = 'none';
+        },
         // To use UISelectors we first have to make it public:
         getSelectors: function(){
             return UISelectors;
@@ -150,6 +179,12 @@ const App = (function(ItemCtrl, UICtrl) {
         if(input.name !== '' && input.calories !== ''){
             // Add item 
             const newItem = ItemCtrl.addItem(input.name, input.calories);
+
+            // Add item to UI list
+            UICtrl.addListItem(newItem);
+
+            // Clear input fields in UI:
+            UICtrl.clearInput();
         }
 
         e.preventDefault();
@@ -168,11 +203,17 @@ const App = (function(ItemCtrl, UICtrl) {
             // We want the getItem when the application initializes so we have to call it here:
             // We are going to put the result of that in a variable:
             const items = ItemCtrl.getItems();
-            // Remember the UI controller is going to take care of anything what is taking place on the UI, and populating the list on the UI with our items
-            // So what we want to do now is take the items we get from the item controller:
-            // Populate list with items:
-            // So we gonna have  a UI function or method, and we going to pass in the items we fetch above
-            UICtrl.populateItemList(items);
+
+            // Now we first want to Check if there are any items, if not then remove the list markup from the UI:
+            if(items.length === 0){
+                UICtrl.hideList();
+            } else {
+                // Populate list with items:
+                // Remember the UI controller is going to take care of anything what is taking place on the UI, and populating the list on the UI with our items
+                // So what we want to do now is take the items we get from the item controller:
+                // So we gonna have  a UI function or method, and we going to pass in the items we fetch above
+                UICtrl.populateItemList(items);
+            }
 
             // Load event listeners:
             loadEventListeners();
