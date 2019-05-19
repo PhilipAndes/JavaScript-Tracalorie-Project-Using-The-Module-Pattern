@@ -92,6 +92,9 @@ const UICtrl = (function() {
     const UISelectors = {
         itemList: '#item-list',
         addBtn: '.add-btn',
+        updateBtn: '.update-btn',
+        deleteBtn: '.delete-btn',
+        backBtn: '.back-btn',
         itemNameInput: '#item-name',
         itemCaloriesInput: '#item-calories',
         totalCalories: '.total-calories'
@@ -168,6 +171,16 @@ const UICtrl = (function() {
             // For this we are going to have to select a UI selector
             document.querySelector(UISelectors.totalCalories).textContent = totalCalories;
         },
+        // Clear edit state
+        clearEditState: function(){
+            UICtrl.clearInput();
+            // Hide all the buttons except for the add meal button:
+            document.querySelector(UISelectors.updateBtn).style.display = 'none';
+            document.querySelector(UISelectors.deleteBtn).style.display = 'none';
+            document.querySelector(UISelectors.backBtn).style.display = 'none';
+            // THe add button inline
+            document.querySelector(UISelectors.addBtn).style.display = 'inline';
+        },
         // To use UISelectors we first have to make it public:
         getSelectors: function(){
             return UISelectors;
@@ -227,6 +240,8 @@ const App = (function(ItemCtrl, UICtrl) {
     // So as you can see, all these modules are going to work very close together
     return {
         init: function(){
+            // Clear edit state / set initial set:
+            UICtrl.clearEditState();
             // Fetch items from data structure
             // We want the getItem when the application initializes so we have to call it here:
             // We are going to put the result of that in a variable:
