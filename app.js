@@ -59,8 +59,24 @@ const ItemCtrl = (function() {
             return newItem;
 
         },
+        getTotalCalories: function(){
+            // So here we need to loop through the items and get the calories
+            // let because this is gonna change
+            let total = 0;
+            // we can access our data and loop through our item array
+            data.items.forEach(function(item){
+                // total = total + item.calories: 
+                total += item.calories;
+            });
+
+            // Set total calories in data structure:
+            data.totalCalories = total;
+
+            // Return total
+            return data.totalCalories;
+        },
         logData: function(){
-            return data;
+            return data; 
         }
     }
 })();
@@ -77,7 +93,8 @@ const UICtrl = (function() {
         itemList: '#item-list',
         addBtn: '.add-btn',
         itemNameInput: '#item-name',
-        itemCaloriesInput: '#item-calories'
+        itemCaloriesInput: '#item-calories',
+        totalCalories: '.total-calories'
     }
 
     // Public methods:
@@ -146,6 +163,11 @@ const UICtrl = (function() {
         hideList: function(){
             document.querySelector(UISelectors.itemList).style.display = 'none';
         },
+        // Show total calories
+        showTotalCalories: function(totalCalories){
+            // For this we are going to have to select a UI selector
+            document.querySelector(UISelectors.totalCalories).textContent = totalCalories;
+        },
         // To use UISelectors we first have to make it public:
         getSelectors: function(){
             return UISelectors;
@@ -183,6 +205,12 @@ const App = (function(ItemCtrl, UICtrl) {
             // Add item to UI list
             UICtrl.addListItem(newItem);
 
+            // Get total calories:
+            const totalCalories = ItemCtrl.getTotalCalories();
+
+            // Add total calories to the UI
+            UICtrl.showTotalCalories(totalCalories);
+
             // Clear input fields in UI:
             UICtrl.clearInput();
         }
@@ -214,6 +242,12 @@ const App = (function(ItemCtrl, UICtrl) {
                 // So we gonna have  a UI function or method, and we going to pass in the items we fetch above
                 UICtrl.populateItemList(items);
             }
+
+            // Get total calories:
+            const totalCalories = ItemCtrl.getTotalCalories();
+
+            // Add total calories to the UI
+            UICtrl.showTotalCalories(totalCalories);
 
             // Load event listeners:
             loadEventListeners();

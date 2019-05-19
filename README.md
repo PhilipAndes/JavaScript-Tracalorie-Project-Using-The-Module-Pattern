@@ -17,4 +17,4 @@
 
 
 - For more information about patterns see:<br>
-"https://github.com/PhilipAndes/JavaScript-Patterns
+https://github.com/PhilipAndes/JavaScript-Patterns
