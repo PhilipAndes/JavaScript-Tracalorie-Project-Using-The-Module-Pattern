@@ -236,7 +236,7 @@ const App = (function(ItemCtrl, UICtrl) {
         // Edit icon click event:
         // We have to use some event delegation as we cannot target the edit item button directly 
         // So we are going to target the list where its in (itemlist)
-        document.querySelector(UISelectors.itemList).addEventListener('click', itemUpdateSubmit);
+        document.querySelector(UISelectors.itemList).addEventListener('click', itemEditClick);
     }
 
     // Add item submit:
@@ -268,8 +268,8 @@ const App = (function(ItemCtrl, UICtrl) {
         e.preventDefault();
     }
 
-    // Update item submit:
-    const itemUpdateSubmit = function(e){
+    // Item edit click:
+    const itemEditClick = function(e){
         // We want to target the edit icon:
         // To do that we target the class of the icon (edit-item)
         if(e.target.classList.contains('edit-item')){
