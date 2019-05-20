@@ -36,6 +36,39 @@ const StorageCtrl = (function(){
                 items = JSON.parse(localStorage.getItem('items'));
             }
             return items;
+        },
+        updateItemStorage: function(updatedItem){
+            let items = JSON.parse(localStorage.getItem('items'));
+
+            // Loop through items:
+            // We also pass in the index, so we know the index of the iteration
+            items.forEach(function(item, index){
+                // If the updated item id is equal to the current item id then we want to splice it out, basicaly remove it:
+                // We want to remove 1 from whatever the index is:
+                // And then replace it with updated item:
+                if(updatedItem.id === item.id){
+                    items.splice(index, 1, updatedItem);
+                }
+            });
+            // Reset local storage:
+            localStorage.setItem('items', JSON.stringify(items));
+        },
+        // Delete items from local storage (delete button):
+        // Same as the function above (updateItemStorage)
+        deleteItemFromStorage: function(id){
+            let items = JSON.parse(localStorage.getItem('items'));
+
+            items.forEach(function(item, index){
+                if(id === item.id){
+                    items.splice(index, 1);
+                }
+            });
+            // Reset local storage:
+            localStorage.setItem('items', JSON.stringify(items));        
+        },
+        // Clear items from local storage (clear button):
+        clearItemsFromStorage: function(){
+            localStorage.removeItem('items');
         }
     }
 })();
@@ -70,7 +103,7 @@ const ItemCtrl = (function() {
         currentItem: null, // When we click the update button in the UI we want the clicked item to be the currentItem, then that is going to be put up in the form to be updated
         totalCalories: 0
     }
-
+ 
     // Public methods:
     return {
         // Let create a function getItems:
@@ -462,6 +495,9 @@ const App = (function(ItemCtrl, StorageCtrl, UICtrl) {
         // Add total calories to the UI
         UICtrl.showTotalCalories(totalCalories);
 
+        // Update local storage:
+        StorageCtrl.updateItemStorage(updatedItem);
+
         UICtrl.clearEditState();
 
         e.preventDefault();
@@ -484,6 +520,9 @@ const App = (function(ItemCtrl, StorageCtrl, UICtrl) {
         // Add total calories to the UI
         UICtrl.showTotalCalories(totalCalories);
 
+        // Delete from local storage:
+        StorageCtrl.deleteItemFromStorage(currentItem.id);
+
         UICtrl.clearEditState();
 
         e.preventDefault();
@@ -502,6 +541,9 @@ const App = (function(ItemCtrl, StorageCtrl, UICtrl) {
 
         // Remove from UI
         UICtrl.removeItems();
+
+        // Clear from local storage (clear button):
+        StorageCtrl.clearItemsFromStorage();
 
         // Hide UL 
         UICtrl.hideList();
