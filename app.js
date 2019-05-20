@@ -104,6 +104,10 @@ const ItemCtrl = (function() {
             // Remove item, and take 1 from the index
             data.items.splice(index, 1);
         },
+        // Clear button:
+        clearAllItems: function(){
+            data.items = [];
+        },
         setCurrentItem: function(item){
             data.currentItem = item;
         },
@@ -246,6 +250,17 @@ const UICtrl = (function() {
             document.querySelector(UISelectors.itemNameInput).value = ItemCtrl.getCurrentItem().name;
             document.querySelector(UISelectors.itemCaloriesInput).value = ItemCtrl.getCurrentItem().calories;
             UICtrl.showEditState();
+        },
+        // Remove items from UI when clear all is clicked:
+        removeItems: function(){
+            let listItems = document.querySelectorAll(UISelectors.listItems);
+
+            // Turn Nodelist into array
+            listItems = Array.from(listItems);
+
+            listItems.forEach(function(item){
+                item.remove();
+            });
         },
         // Hide list if no items:
         // Use this function in the init below!
@@ -430,7 +445,22 @@ const App = (function(ItemCtrl, UICtrl) {
 
     // Clear items event:
     const clearAllItemsClick = function(){
-        //
+        // Delete all items from data structure
+        ItemCtrl.clearAllItems();
+
+        // Get total calories:
+        const totalCalories = ItemCtrl.getTotalCalories();
+
+        // Add total calories to the UI
+        UICtrl.showTotalCalories(totalCalories);
+
+        // Remove from UI
+        UICtrl.removeItems();
+
+        // Hide UL 
+        UICtrl.hideList();
+
+
     }
 
 
