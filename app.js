@@ -92,6 +92,18 @@ const ItemCtrl = (function() {
             return found;
             // Notice that this will change it in the data structure, not in the UI!
         },
+        deleteItem: function(id){
+            // Get ids with the map method:
+            const ids = data.items.map(function(item){
+                return item.id;
+            });
+
+            // Get index:
+            const index = ids.indexOf(id);
+            // Splice it out of the array:
+            // Remove item, and take 1 from the index
+            data.items.splice(index, 1);
+        },
         setCurrentItem: function(item){
             data.currentItem = item;
         },
@@ -136,6 +148,7 @@ const UICtrl = (function() {
         updateBtn: '.update-btn',
         deleteBtn: '.delete-btn',
         backBtn: '.back-btn',
+        clearBtn: '.clear-btn',
         itemNameInput: '#item-name',
         itemCaloriesInput: '#item-calories',
         totalCalories: '.total-calories'
@@ -217,6 +230,12 @@ const UICtrl = (function() {
                 }
             });
         },
+        // Delete list item:
+        deleteListItem: function(id){
+            const itemID = `#item-${id}`;
+            const item = document.querySelector(itemID);
+            item.remove();
+        },
         // Clear input fields in the UI:
         clearInput: function(){
             document.querySelector(UISelectors.itemNameInput).value = '';
@@ -292,8 +311,17 @@ const App = (function(ItemCtrl, UICtrl) {
         // So we are going to target the list where its in (itemlist)
         document.querySelector(UISelectors.itemList).addEventListener('click', itemEditClick);
 
-        // Updte item event
+        // Update item event
         document.querySelector(UISelectors.updateBtn).addEventListener('click', itemUpdateSubmit);
+
+        // Delete item event
+        document.querySelector(UISelectors.deleteBtn).addEventListener('click', itemDeleteSubmit);
+
+        // Back button event
+        document.querySelector(UISelectors.backBtn).addEventListener('click', UICtrl.clearEditState); 
+
+        // Clear item event
+        document.querySelector(UISelectors.clearBtn).addEventListener('click', clearAllItemsClick);
     }
 
     // Add item submit:
@@ -376,6 +404,33 @@ const App = (function(ItemCtrl, UICtrl) {
         UICtrl.clearEditState();
 
         e.preventDefault();
+    }
+
+    // Delete button event:
+    const itemDeleteSubmit = function(e){
+        // get current item id
+        const currentItem = ItemCtrl.getCurrentItem();
+
+        // Delete from data structure
+        ItemCtrl.deleteItem(currentItem.id);
+
+        // Delete from UI
+        UICtrl.deleteListItem(currentItem.id);
+
+        // Get total calories:
+        const totalCalories = ItemCtrl.getTotalCalories();
+
+        // Add total calories to the UI
+        UICtrl.showTotalCalories(totalCalories);
+
+        UICtrl.clearEditState();
+
+        e.preventDefault();
+    }
+
+    // Clear items event:
+    const clearAllItemsClick = function(){
+        //
     }
 
 
