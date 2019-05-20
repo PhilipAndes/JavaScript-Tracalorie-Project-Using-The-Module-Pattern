@@ -1,4 +1,45 @@
 // Storage Controller
+// We set this to an iify
+const StorageCtrl = (function(){
+    // Public methods:
+    return {
+        storeItem: function(item){
+            let items;
+            // Check if any items in local storage:
+            if(localStorage.getItem('items') === null){
+                // if not then set it an empty array
+                items = [];
+                // Push new item:
+                items.push(item);
+                // Set local storage:
+                // As local storage holds strings we have to wrap it in json.stringify to get it as object
+                localStorage.setItem('items', JSON.stringify(items));
+            } else {
+                // If there are items in local storage we need to get those items:
+                // And remember because it is a string in local storage we gonna need to parse it with json
+                items = JSON.parse(localStorage.getItem('items'));
+
+                // Push the new item
+                items.push(item);
+
+                // Reset local storage:
+                localStorage.setItem('items', JSON.stringify(items));
+            }
+        },
+        // Get items from local storage
+        getItemsFromStorage: function(){
+            let items;
+            if(localStorage.getItem('items') === null){
+                // If there is nothing there items will be set to nothing
+                items = [];
+            } else {
+                items = JSON.parse(localStorage.getItem('items'));
+            }
+            return items;
+        }
+    }
+})();
+
 
 // Item Controller
 // We set this to an iify (so an immediate invoked function expression)
@@ -18,12 +59,14 @@ const ItemCtrl = (function() {
     const data = {
         // We use an array of objects:
         // Each item will have an ID, name and calories:
-        items: [
-            // Commented this out, as this was just for testing
-            // {id: 0, name: 'Steak Dinner', calories: 1200},
-            // {id: 1, name: 'Cookie', calories: 400},
-            // {id: 2, name: 'Eggs', calories: 300}
-        ],
+        // Commented this out, as this was just for testing:
+        // items: [    
+        //     // {id: 0, name: 'Steak Dinner', calories: 1200},
+        //     // {id: 1, name: 'Cookie', calories: 400},
+        //     // {id: 2, name: 'Eggs', calories: 300}
+        // ],
+        // We set it to a new item:
+        items: StorageCtrl.getItemsFromStorage(),
         currentItem: null, // When we click the update button in the UI we want the clicked item to be the currentItem, then that is going to be put up in the form to be updated
         totalCalories: 0
     }
@@ -301,7 +344,7 @@ const UICtrl = (function() {
 
 
 // App Controller 
-const App = (function(ItemCtrl, UICtrl) {
+const App = (function(ItemCtrl, StorageCtrl, UICtrl) {
     // Load event listeners
     const loadEventListeners = function(){
         // We have to call the loadEventListeners in the init function below!
@@ -360,6 +403,9 @@ const App = (function(ItemCtrl, UICtrl) {
 
             // Add total calories to the UI
             UICtrl.showTotalCalories(totalCalories);
+
+            // Store in localStorage:
+            StorageCtrl.storeItem(newItem);
 
             // Clear input fields in UI:
             UICtrl.clearInput();
@@ -502,7 +548,7 @@ const App = (function(ItemCtrl, UICtrl) {
         }
     }
     
-})(ItemCtrl, UICtrl);
+})(ItemCtrl, StorageCtrl, UICtrl);
 
 // Initialize App
 App.init();
