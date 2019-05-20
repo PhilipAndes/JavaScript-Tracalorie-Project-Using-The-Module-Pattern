@@ -19,6 +19,7 @@ const ItemCtrl = (function() {
         // We use an array of objects:
         // Each item will have an ID, name and calories:
         items: [
+            // Commented this out, as this was just for testing
             // {id: 0, name: 'Steak Dinner', calories: 1200},
             // {id: 1, name: 'Cookie', calories: 400},
             // {id: 2, name: 'Eggs', calories: 300}
@@ -69,6 +70,28 @@ const ItemCtrl = (function() {
             });
             return found;
         },
+        // When we click the update button:
+        updateItem: function(name, calories){
+            // Calories to number:
+            calories = parseInt(calories);
+
+            let found = null;
+
+            data.items.forEach(function(item){
+                // Remember when we click the edit icon, its going to be added to the currentitem, so:
+                if(item.id === data.currentItem.id){
+                    // Then set the item name equal to the name passed in above
+                    item.name = name;
+                    // Same for the calories
+                    item.calories = calories;
+                    // Then set found equal to the item itself
+                    found = item;
+                }
+            });
+            // And return found:
+            return found;
+            // Notice that this will change it in the data structure, not in the UI!
+        },
         setCurrentItem: function(item){
             data.currentItem = item;
         },
@@ -108,6 +131,7 @@ const UICtrl = (function() {
     // It makes the code more efficient as wel as more scalable
     const UISelectors = {
         itemList: '#item-list',
+        listItems: '#item-list li', // all the <li>
         addBtn: '.add-btn',
         updateBtn: '.update-btn',
         deleteBtn: '.delete-btn',
@@ -173,6 +197,26 @@ const UICtrl = (function() {
             // Now we just have to insert it:
             document.querySelector(UISelectors.itemList).insertAdjacentElement('beforeend', li);
         },
+        updateListItem: function(item){
+            let listItems = document.querySelectorAll(UISelectors.listItems);
+            // So now we putting this in the listItems variable
+            // This will give us a node list, and we need to loop through these nodes, we cannot use a foreach on a node so we have to convert it into an array:
+            // Turn Node list into array:
+            listItems = Array.from(listItems);
+            // So now we can do whatever we want
+            listItems.forEach(function(listItem){
+                // we set it to a new variable, and use getAttribute because we want to get the id:
+                const itemID = listItem.getAttribute('id');
+
+                if(itemID === `item-${item.id}`){
+                    // If this is true then we know its the one we want to actual update:
+                    document.querySelector(`#${itemID}`).innerHTML = `<strong>${item.name}: </strong> <em>${item.calories}  Calories</em>
+                    <a href="#" class="secondary-content">
+                        <i class="edit-item fa fa-pencil"></i>
+                    </a>`;
+                }
+            });
+        },
         // Clear input fields in the UI:
         clearInput: function(){
             document.querySelector(UISelectors.itemNameInput).value = '';
@@ -233,10 +277,23 @@ const App = (function(ItemCtrl, UICtrl) {
         // We need an event to add a item:
         document.querySelector(UISelectors.addBtn).addEventListener('click', itemAddSubmit);
 
+        // Disable submit on enter
+        document.addEventListener('keypress', function(e){
+            // You can look up the keycodes for each key, enter = 13
+            // Some older browsers dont support the key code so we say or || e.which === 13 
+            if(e.keyCode === 13 || e.which === 13){
+                e.preventDefault();
+                return false;
+            }
+        });
+
         // Edit icon click event:
         // We have to use some event delegation as we cannot target the edit item button directly 
         // So we are going to target the list where its in (itemlist)
         document.querySelector(UISelectors.itemList).addEventListener('click', itemEditClick);
+
+        // Updte item event
+        document.querySelector(UISelectors.updateBtn).addEventListener('click', itemUpdateSubmit);
     }
 
     // Add item submit:
@@ -295,6 +352,28 @@ const App = (function(ItemCtrl, UICtrl) {
             // Add item to form when edit icon is clicked
             UICtrl.addItemToForm();
         }
+
+        e.preventDefault();
+    }
+
+    // Update item submit:
+    const itemUpdateSubmit = function(e){
+        // Get item input:
+        const input = UICtrl.getItemInput();
+
+        // Update item:
+        const updatedItem = ItemCtrl.updateItem(input.name, input.calories);
+
+        // Update the UI
+        UICtrl.updateListItem(updatedItem);
+
+        // Get total calories:
+        const totalCalories = ItemCtrl.getTotalCalories();
+
+        // Add total calories to the UI
+        UICtrl.showTotalCalories(totalCalories);
+
+        UICtrl.clearEditState();
 
         e.preventDefault();
     }
